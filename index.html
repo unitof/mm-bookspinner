@@ -124,15 +124,32 @@
       border-left-style: solid;
       border-right-style: solid;
       padding: 30px 0;
+      margin-bottom: 50px;
     }
 
-    .book-section .book-features {
+    .book-section .book-hero {
       text-align: left;
+      display: flex;
+      flex-direction: row;
     }
 
-    .book-section .book-spinner {
-      display: inline-block;
-      width: 70%;
+    .book-section .book-hero .book-spinner {
+      flex: 0 0 auto;
+    }
+
+    .book-section .book-hero .book-features {
+      flex: 1; /* fill remaining space */
+      align-self: center; /* vertical center */
+      padding-left: 1.5rem;
+    }
+
+    .book-features ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .book-features li {
+      margin: 0.5em 0;
     }
 
     .book-spinner {
@@ -250,7 +267,7 @@
       mmuseumm 2020<br>
       <span class="large strong">JUMBO CATALOG</span>
     </h3>
-    <div class="book-features">
+    <div class="book-hero">
       <div class="book-spinner scene">
         <div class="case">
           <figure class="face front"></figure>
@@ -261,9 +278,26 @@
           <figure class="face tail"></figure>
         </div>
       </div>
-      <p class="small">
-        Over 300 pages of revealing objects!
-      </p>
+      <div class="book-features">
+        <p class="small">
+          Over 300 pages of revealing objects!
+        </p>
+        <p class="small">includes:</p>
+        <ul class="small">
+          <li class="normalcaps">The Power of Power</li>
+          <li class="normalcaps">Pipelines of Complicity</li>
+          <li class="normalcaps">Not Allowed!</li>
+          <li class="normalcaps">Human Exchanges</li>
+          <li class="normalcaps">The Final Straw</li>
+          <li class="normalcaps">Hong Kong Protest Tools</li>
+          <li class="normalcaps">Children Lead the Way</li>
+          <li class="normalcaps">The Value of a Dollar</li>
+          <li class="normalcaps">Losing Time</li>
+          <li class="normalcaps">Modern Slavery?</li>
+          <li class="normalcaps">Natural Nature</li>
+          <li>and more!</li>
+        </ul>
+      </div>
     </div>
   </div>
 </body>
