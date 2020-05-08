@@ -5,284 +5,284 @@
 
 <!-- SQSP: Page > Settings > Advanced > Page Header Code Injection -->
 
-  <style>
+<style>
 
-    /* SQSP OVERRIDES */
-    * {
-      font-size: 1rem;
-      text-transform: none;
-    }
+  /* SQSP OVERRIDES */
+  * {
+    font-size: 1rem;
+    text-transform: none;
+  }
 
-    @font-face {
-      font-family: "Chopin Script";
-      src: url('https://mm-fonts.unitof.now.sh/chopinscript-mmweb.woff');
-    }
+  @font-face {
+    font-family: "Chopin Script";
+    src: url('https://mm-fonts.unitof.now.sh/chopinscript-mmweb.woff');
+  }
 
-    #page {
-      padding: 5vmin 0 !important;
-    }
+  #page {
+    padding: 5vmin 0 !important;
+  }
 
-    #mainContent {
-      background: none !important;
-      width: 100% !important;
-      min-height: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
+  #mainContent {
+    background: none !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 
-    /* hide navbar */
-    .sqs-announcement-bar {
-      display: none !important;
-    }
+  /* hide navbar */
+  .sqs-announcement-bar {
+    display: none !important;
+  }
 
-    .sqs-block {
-      padding: 2vmin;
-    }
+  .sqs-block {
+    padding: 2vmin;
+  }
 
-    :root {
-      --mmbook-width: 50vw; /* 6in, reference */
-      --mmbook-height: calc(var(--mmbook-width) * 1.5); /* 9in = 1.5 × reference;  */
-      --mmbook-thickness: calc(var(--mmbook-height) * 0.137888889); /* 1.241in = 1.241/9 × reference */
-      /*font-size: min(48px, 4vw);*/ /* doesn't work on Safari */
-      font-size: 4vw;
-    }
+  :root {
+    --mmbook-width: 50vw; /* 6in, reference */
+    --mmbook-height: calc(var(--mmbook-width) * 1.5); /* 9in = 1.5 × reference;  */
+    --mmbook-thickness: calc(var(--mmbook-height) * 0.137888889); /* 1.241in = 1.241/9 × reference */
+    /*font-size: min(48px, 4vw);*/ /* doesn't work on Safari */
+    font-size: 4vw;
+  }
 
-    body {
-      margin: 0 !important;
-      padding: 0;
-      width: 100vw;
-      height: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
+  body {
+    margin: 0 !important;
+    padding: 0;
+    width: 100vw;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 
-      /*max-width: 1200px;*/
-      /*margin: auto;*/
+    /*max-width: 1200px;*/
+    /*margin: auto;*/
 
-      background-color: #ed2224;
+    background-color: #ed2224;
 
-      text-align: center;
-      font-variant: small-caps;
-      font-feature-settings: "smcp";
-      letter-spacing: 0.1em;
-    }
+    text-align: center;
+    font-variant: small-caps;
+    font-feature-settings: "smcp";
+    letter-spacing: 0.1em;
+  }
 
-    body * {
-      color: white !important;
-      font-family: 'Times New Roman', Times, serif !important;
-    }
+  body * {
+    color: white !important;
+    font-family: 'Times New Roman', Times, serif !important;
+  }
 
-    h1, h2, h3, h4, h5, h6 {
-      font-weight: normal;
-    }
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+  }
 
-    .cursive {
-      font-family: "Chopin Script", "Snell Roundhand", cursive !important;
-      font-size: 1.55em;
-      font-variant: none;
-      letter-spacing: 0 !important;
-      font-weight: normal !important;
-    }
+  .cursive {
+    font-family: "Chopin Script", "Snell Roundhand", cursive !important;
+    font-size: 1.55em;
+    font-variant: none;
+    letter-spacing: 0 !important;
+    font-weight: normal !important;
+  }
 
-    .cursive {
-      padding-left: 0.2em;
-      padding-right: 0.2em;
-    }
+  .cursive {
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+  }
 
-    .huge.cursive {
-      /* Chopin veers too far left centered on its own */
-      padding-right: 0;
-    }
+  .huge.cursive {
+    /* Chopin veers too far left centered on its own */
+    padding-right: 0;
+  }
 
-    .huge {
-      font-size: 4rem;
-      letter-spacing: 0.1em;
-    }
+  .huge {
+    font-size: 4rem;
+    letter-spacing: 0.1em;
+  }
 
-    .large {
-      font-size: 2rem;
-      letter-spacing: 0.1em;
-    }
+  .large {
+    font-size: 2rem;
+    letter-spacing: 0.1em;
+  }
 
-    .big {
-      font-size: 1.2rem;
-      letter-spacing: 0.1em;
-    }
+  .big {
+    font-size: 1.2rem;
+    letter-spacing: 0.1em;
+  }
 
-    .small {
-      font-size: 0.7em;
-    }
+  .small {
+    font-size: 0.7em;
+  }
 
-    .strong {
-      font-weight: bold;
-    }
+  .strong {
+    font-weight: bold;
+  }
 
-    .italic {
-      font-style: italic;
-    }
+  .italic {
+    font-style: italic;
+  }
 
-    .wavy {
-      text-decoration: underline;
-      text-underline-position: under;
-      text-decoration-style: wavy;
-    }
+  .wavy {
+    text-decoration: underline;
+    text-underline-position: under;
+    text-decoration-style: wavy;
+  }
 
-    .normalcaps {
-      font-variant: none;
-      font-feature-settings: none;
-      letter-spacing: 0;
-    }
+  .normalcaps {
+    font-variant: none;
+    font-feature-settings: none;
+    letter-spacing: 0;
+  }
 
-    .raisebaseline {
-      position: relative;
-      bottom: 0.07em;
-    }
+  .raisebaseline {
+    position: relative;
+    bottom: 0.07em;
+  }
 
-    .book-section {
-      width: 90%;
-    }
+  .book-section {
+    width: 90%;
+  }
 
-    .book-section .header {
-      border: 1px white;
-      border-left-style: solid;
-      border-right-style: solid;
-      padding: 30px 0;
-      margin-bottom: 50px;
-    }
+  .book-section .header {
+    border: 1px white;
+    border-left-style: solid;
+    border-right-style: solid;
+    padding: 30px 0;
+    margin-bottom: 50px;
+  }
 
-    .book-section .book-hero {
-      text-align: left;
-      display: flex;
-      flex-direction: row;
-    }
+  .book-section .book-hero {
+    text-align: left;
+    display: flex;
+    flex-direction: row;
+  }
 
-    .book-section .book-hero .book-spinner {
-      flex: 0 0 auto;
-    }
+  .book-section .book-hero .book-spinner {
+    flex: 0 0 auto;
+  }
 
-    .book-section .book-hero .book-features {
-      flex: 1; /* fill remaining space */
-      align-self: center; /* vertical center */
-      padding-left: 1.5rem;
-    }
+  .book-section .book-hero .book-features {
+    flex: 1; /* fill remaining space */
+    align-self: center; /* vertical center */
+    padding-left: 1.5rem;
+  }
 
-    .book-features ul {
-      list-style: none;
-      padding: 0;
-    }
+  .book-features ul {
+    list-style: none;
+    padding: 0;
+  }
 
-    .book-features li {
-      margin: 0.5em 0;
-    }
+  .book-features li {
+    margin: 0.5em 0;
+  }
 
-    .book-spinner {
-      float: left;
-    }
+  .book-spinner {
+    float: left;
+  }
 
-    .buy-link {
-      display: block;
-      padding: 20px;
-      border: 1px solid white;
-      font-weight: bold;
-      color: white;
-      text-decoration: none;
-    }
+  .buy-link {
+    display: block;
+    padding: 20px;
+    border: 1px solid white;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+  }
 
-    .buy-link:hover {
-      color: #ed2224;
-      background: white;
-    }
+  .buy-link:hover {
+    color: #ed2224;
+    background: white;
+  }
 
-    .buy-link h4 {
-      font-weight: inherit;
-      margin-top: 0.5em;
-      margin-bottom: 0.7em;
-    }
+  .buy-link h4 {
+    font-weight: inherit;
+    margin-top: 0.5em;
+    margin-bottom: 0.7em;
+  }
 
-    figure {
-      margin: 0;
-      padding: 0;
-    }
+  figure {
+    margin: 0;
+    padding: 0;
+  }
 
-    .book-spinner.scene {
-      width: var(--mmbook-width);
-      height: var(--mmbook-height);
-      perspective: 24in;
-      /*border: 4px solid black;*/
-    }
+  .book-spinner.scene {
+    width: var(--mmbook-width);
+    height: var(--mmbook-height);
+    perspective: 24in;
+    /*border: 4px solid black;*/
+  }
 
-    .book-spinner .case {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transform-origin: 50% 50% calc(-0.5 * var(--mmbook-thickness));
-      animation: revolve 10s linear infinite;
-      margin-right: 200px;
-    }
+  .book-spinner .case {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform-origin: 50% 50% calc(-0.5 * var(--mmbook-thickness));
+    animation: revolve 10s linear infinite;
+    margin-right: 200px;
+  }
 
-    .book-spinner .face {
-      background-color: #f3f3f3;
-      position: absolute;
-      transform-origin: 0 0;
-      background-size: cover;
+  .book-spinner .face {
+    background-color: #f3f3f3;
+    position: absolute;
+    transform-origin: 0 0;
+    background-size: cover;
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
 
-    .book-spinner .face.front {
-      background-image: url(img/front.svg);
-      width: var(--mmbook-width);
-      height: var(--mmbook-height);
-      transform: rotateY( 0 ) translateZ( 0 );
-    }
-    .book-spinner .face.foreedge {
-      background-image: url(img/foreedge.jpg);
-      width: var(--mmbook-thickness);
-      height: var(--mmbook-height);
-      transform: rotateY(90deg) translateZ( var(--mmbook-width) );
-    }
-    .book-spinner .face.back {
-      background-image: url(img/back.svg);
-      transform-origin: 50% 50%; /* eliminates need for translateX(100%) */
-      width: var(--mmbook-width);
-      height: var(--mmbook-height);
-      transform: rotateY(180deg) translateZ( var(--mmbook-thickness) );
-    }
-    .book-spinner .face.spine {
-      background-image: url(img/spine.svg);
-      width: var(--mmbook-thickness);
-      height: var(--mmbook-height);
-      transform: rotateY(-90deg) translateX(-100%) translateZ( 0 );
-    }
-    .book-spinner .face.head {
-      background-image: url(img/foreedge.jpg);
-      background-position-x: 100%;
-      width: var(--mmbook-thickness);
-      height: var(--mmbook-width);
-      transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%);
-    }
-    .book-spinner .face.tail {
-      background-image: url(img/foreedge.jpg);
-      width: var(--mmbook-thickness);
-      height: var(--mmbook-width);
-      transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%) translateZ( var(--mmbook-height) );
-    }
+  .book-spinner .face.front {
+    background-image: url(img/front.svg);
+    width: var(--mmbook-width);
+    height: var(--mmbook-height);
+    transform: rotateY( 0 ) translateZ( 0 );
+  }
+  .book-spinner .face.foreedge {
+    background-image: url(img/foreedge.jpg);
+    width: var(--mmbook-thickness);
+    height: var(--mmbook-height);
+    transform: rotateY(90deg) translateZ( var(--mmbook-width) );
+  }
+  .book-spinner .face.back {
+    background-image: url(img/back.svg);
+    transform-origin: 50% 50%; /* eliminates need for translateX(100%) */
+    width: var(--mmbook-width);
+    height: var(--mmbook-height);
+    transform: rotateY(180deg) translateZ( var(--mmbook-thickness) );
+  }
+  .book-spinner .face.spine {
+    background-image: url(img/spine.svg);
+    width: var(--mmbook-thickness);
+    height: var(--mmbook-height);
+    transform: rotateY(-90deg) translateX(-100%) translateZ( 0 );
+  }
+  .book-spinner .face.head {
+    background-image: url(img/foreedge.jpg);
+    background-position-x: 100%;
+    width: var(--mmbook-thickness);
+    height: var(--mmbook-width);
+    transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%);
+  }
+  .book-spinner .face.tail {
+    background-image: url(img/foreedge.jpg);
+    width: var(--mmbook-thickness);
+    height: var(--mmbook-width);
+    transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%) translateZ( var(--mmbook-height) );
+  }
 
-    @keyframes revolve {
-      from {
-        transform: rotateY(0);
-      }
-      to {
-        transform: rotateY(-360deg);
-      }
+  @keyframes revolve {
+    from {
+      transform: rotateY(0);
     }
+    to {
+      transform: rotateY(-360deg);
+    }
+  }
 
-  </style>
+</style>
 
 <!-- END Page Header Code Injection -->
 
