@@ -33,6 +33,19 @@
     display: none !important;
   }
 
+  .sqs-block-gallery {
+    max-width: 1200px;
+    margin: auto;
+  }
+
+  .image-wrapper {
+    box-shadow: 0 0 10px #55555555;
+  }
+
+  .image-wrapper + .image-wrapper {
+    margin-top: 30px;
+  }
+
   /* END SQSP OVERRIDES */
 
   @font-face {
@@ -182,6 +195,7 @@
     font-weight: bold;
     color: white;
     text-decoration: none;
+    margin-bottom: 40px;
   }
 
   #takeover .buy-link:hover {
@@ -235,39 +249,39 @@
   }
 
   #takeover .book-spinner .face.front {
-    background-image: url(img/front.svg);
+    background-image: url(https://mm-bookspinner.now.sh/img/front.svg);
     width: var(--mmbook-width);
     height: var(--mmbook-height);
     transform: rotateY( 0 ) translateZ( 0 );
   }
   #takeover .book-spinner .face.foreedge {
-    background-image: url(img/foreedge.jpg);
+    background-image: url(https://mm-bookspinner.now.sh/img/foreedge.jpg);
     width: var(--mmbook-thickness);
     height: var(--mmbook-height);
     transform: rotateY(90deg) translateZ( var(--mmbook-width) );
   }
   #takeover .book-spinner .face.back {
-    background-image: url(img/back.svg);
+    background-image: url(https://mm-bookspinner.now.sh/img/back.svg);
     transform-origin: 50% 50%; /* eliminates need for translateX(100%) */
     width: var(--mmbook-width);
     height: var(--mmbook-height);
     transform: rotateY(180deg) translateZ( var(--mmbook-thickness) );
   }
   #takeover .book-spinner .face.spine {
-    background-image: url(img/spine.svg);
+    background-image: url(https://mm-bookspinner.now.sh/img/spine.svg);
     width: var(--mmbook-thickness);
     height: var(--mmbook-height);
     transform: rotateY(-90deg) translateX(-100%) translateZ( 0 );
   }
   #takeover .book-spinner .face.head {
-    background-image: url(img/foreedge.jpg);
+    background-image: url(https://mm-bookspinner.now.sh/img/foreedge.jpg);
     background-position-x: 100%;
     width: var(--mmbook-thickness);
     height: var(--mmbook-width);
     transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%);
   }
   #takeover .book-spinner .face.tail {
-    background-image: url(img/foreedge.jpg);
+    background-image: url(https://mm-bookspinner.now.sh/img/foreedge.jpg);
     width: var(--mmbook-thickness);
     height: var(--mmbook-width);
     transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%) translateZ( var(--mmbook-height) );
@@ -360,6 +374,7 @@
       a non-profit organization<br>
       for public benefit
     </a>
+    <span class="strong">a little look inside the catalog</span>
   </div>
 </div>
 
