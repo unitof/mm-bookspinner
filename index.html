@@ -8,7 +8,7 @@
 <style>
 
   /* SQSP OVERRIDES */
-  *, h1, h2, h3, h4, h5, h6, p, ul, li {
+  #takeover *, h1, h2, h3, h4, h5, h6, p, ul, li {
     font-family: 'Times New Roman', Times, serif !important;
     color: white;
     font-size: 1rem;
@@ -62,18 +62,20 @@
     /*margin: auto;*/
 
     background-color: #ed2224;
-
-    text-align: center;
-    font-variant: small-caps;
-    font-feature-settings: "smcp";
-    letter-spacing: 0.1em;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
   }
 
-  .cursive {
+  #takeover {
+    text-align: center;
+    font-variant: small-caps;
+    font-feature-settings: "smcp";
+    letter-spacing: 0.1em;
+  }
+
+  #takeover .cursive {
     font-family: "Chopin Script", "Snell Roundhand", cursive !important;
     font-size: 1.55em;
     font-variant: none;
@@ -81,66 +83,66 @@
     font-weight: normal !important;
   }
 
-  .cursive {
+  #takeover .cursive {
     padding-left: 0.2em;
     padding-right: 0.2em;
   }
 
-  .huge.cursive {
+  #takeover .huge.cursive {
     /* Chopin veers too far left centered on its own */
     padding-right: 0;
   }
 
-  .huge {
+  #takeover .huge {
     font-size: 4rem;
     letter-spacing: 0.1em;
   }
 
-  .large {
+  #takeover .large {
     font-size: 2rem;
     letter-spacing: 0.1em;
   }
 
-  .big {
+  #takeover .big {
     font-size: 1.2rem;
     letter-spacing: 0.1em;
   }
 
-  .small {
+  #takeover .small {
     font-size: 0.7em;
   }
 
-  .strong {
+  #takeover .strong {
     font-weight: bold;
   }
 
-  .italic {
+  #takeover .italic {
     font-style: italic;
   }
 
-  .wavy {
+  #takeover .wavy {
     text-decoration: underline;
     text-underline-position: under;
     text-decoration-style: wavy;
   }
 
-  .normalcaps {
+  #takeover .normalcaps {
     font-variant: none;
     font-feature-settings: none;
     letter-spacing: 0;
   }
 
-  .raisebaseline {
+  #takeover .raisebaseline {
     position: relative;
     bottom: 0.07em;
   }
 
-  .book-section {
+  #takeover .book-section {
     width: 90%;
     margin: auto;
   }
 
-  .book-section .header {
+  #takeover .book-section .header {
     border: 1px white;
     border-left-style: solid;
     border-right-style: solid;
@@ -148,32 +150,32 @@
     margin-bottom: 50px;
   }
 
-  .book-section .book-hero {
+  #takeover .book-section .book-hero {
     text-align: left;
     display: flex;
     flex-direction: row;
   }
 
-  .book-section .book-hero .book-spinner {
+  #takeover .book-section .book-hero .book-spinner {
     flex: 0 0 auto;
   }
 
-  .book-section .book-hero .book-features {
+  #takeover .book-section .book-hero .book-features {
     flex: 1; /* fill remaining space */
     align-self: center; /* vertical center */
     padding-left: 1.5rem;
   }
 
-  .book-features ul {
+  #takeover .book-features ul {
     list-style: none;
     padding: 0;
   }
 
-  .book-features li {
+  #takeover .book-features li {
     margin: 0.5em 0;
   }
 
-  .buy-link {
+  #takeover .buy-link {
     display: block;
     padding: 20px;
     border: 1px solid white;
@@ -182,17 +184,17 @@
     text-decoration: none;
   }
 
-  .buy-link:hover {
+  #takeover .buy-link:hover {
     color: #ed2224;
     background: white;
   }
 
-  .buy-link:hover * {
+  #takeover .buy-link:hover * {
     /* !important hell */
     color: #ed2224 !important;
   }
 
-  .buy-link h4 {
+  #takeover .buy-link h4 {
     font-weight: inherit;
     margin-top: 0.5em;
     margin-bottom: 0.7em;
@@ -203,14 +205,14 @@
     padding: 0;
   }
 
-  .book-spinner.scene {
+  #takeover .book-spinner.scene {
     width: var(--mmbook-width);
     height: var(--mmbook-height);
     perspective: 24in;
     /*border: 4px solid black;*/
   }
 
-  .book-spinner .case {
+  #takeover .book-spinner .case {
     width: 100%;
     height: 100%;
     position: relative;
@@ -220,7 +222,7 @@
     margin-right: 200px;
   }
 
-  .book-spinner .face {
+  #takeover .book-spinner .face {
     background-color: #f3f3f3;
     position: absolute;
     transform-origin: 0 0;
@@ -232,39 +234,39 @@
     text-align: center;
   }
 
-  .book-spinner .face.front {
+  #takeover .book-spinner .face.front {
     background-image: url(img/front.svg);
     width: var(--mmbook-width);
     height: var(--mmbook-height);
     transform: rotateY( 0 ) translateZ( 0 );
   }
-  .book-spinner .face.foreedge {
+  #takeover .book-spinner .face.foreedge {
     background-image: url(img/foreedge.jpg);
     width: var(--mmbook-thickness);
     height: var(--mmbook-height);
     transform: rotateY(90deg) translateZ( var(--mmbook-width) );
   }
-  .book-spinner .face.back {
+  #takeover .book-spinner .face.back {
     background-image: url(img/back.svg);
     transform-origin: 50% 50%; /* eliminates need for translateX(100%) */
     width: var(--mmbook-width);
     height: var(--mmbook-height);
     transform: rotateY(180deg) translateZ( var(--mmbook-thickness) );
   }
-  .book-spinner .face.spine {
+  #takeover .book-spinner .face.spine {
     background-image: url(img/spine.svg);
     width: var(--mmbook-thickness);
     height: var(--mmbook-height);
     transform: rotateY(-90deg) translateX(-100%) translateZ( 0 );
   }
-  .book-spinner .face.head {
+  #takeover .book-spinner .face.head {
     background-image: url(img/foreedge.jpg);
     background-position-x: 100%;
     width: var(--mmbook-thickness);
     height: var(--mmbook-width);
     transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%);
   }
-  .book-spinner .face.tail {
+  #takeover .book-spinner .face.tail {
     background-image: url(img/foreedge.jpg);
     width: var(--mmbook-thickness);
     height: var(--mmbook-width);
