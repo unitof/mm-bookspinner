@@ -3,6 +3,11 @@
 <head>
   <title>MM 2020 Catalog</title>
   <style>
+    @font-face {
+      font-family: "Chopin Script";
+      src: url('https://mm-fonts.unitof.now.sh/chopinscript-mmweb.woff');
+    }
+
     #page {
       padding: 5vmin 0 !important;
     }
@@ -28,16 +33,62 @@
       --mmbook-height: 70vh; /* 9in, reference */
       --mmbook-width: calc(var(--mmbook-height) * 0.66666667); /* 6in = 6/9 × reference */
       --mmbook-thickness: calc(var(--mmbook-height) * 0.137888889); /* 1.241in = 1.241/9 × reference */
+      font-size: 4vw;
     }
 
     body {
       margin: 0;
       padding: 0;
       width: 100vw;
-      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
+
+      background-color: #ed2224;
+      margin: 0 !important;
+
+      font-family: 'Times New Roman', Times, serif;
+      color: white !important;
+      text-align: center;
+      font-variant: small-caps;
+      font-feature-settings: "smcp";
+    }
+
+    h1 {
+      font-weight: normal;
+      font-size: inherit;
+    }
+
+    p {
+      color: white !important;
+      font-size: .7em !important;
+    }
+
+    .cursive {
+      font-family: "Chopin Script", "Snell Roundhand", cursive;
+      font-size: 1.55em;
+      font-variant: none;
+      letter-spacing: 0 !important;
+    }
+
+    .huge {
+      font-size: 4rem;
+      letter-spacing: 0.1em;
+    }
+
+    .huge.cursive {
+      /* Chopin veers too far left centered on its own */
+      padding-left: 0.2em;
+    }
+
+    .large {
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+    }
+
+    .small {
+      font-size: 1em;
     }
 
     figure {
@@ -124,6 +175,12 @@
   </style>
 </head>
 <body>
+  <h1>
+    <span class="huge cursive">normally</span><br>
+    <span class="cursive">this</span> would be your invitation<br>
+    <span class="small cursive">to the</span><br>
+    <span class="large">Mmuseumm 2020<br>Opening Ceremonies</span>
+  </h1>
   <div class="mmbook scene">
     <div class="case">
       <figure class="face front"></figure>
