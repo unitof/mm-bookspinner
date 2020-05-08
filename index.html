@@ -92,6 +92,11 @@
       letter-spacing: 0.1em;
     }
 
+    .big {
+      font-size: 1.2rem;
+      letter-spacing: 0.1em;
+    }
+
     .small {
       font-size: 0.7em;
     }
@@ -114,6 +119,11 @@
       font-variant: none;
       font-feature-settings: none;
       letter-spacing: 0;
+    }
+
+    .raisebaseline {
+      position: relative;
+      bottom: 0.07em;
     }
 
     .book-section {
@@ -155,6 +165,26 @@
 
     .book-spinner {
       float: left;
+    }
+
+    .buy-link {
+      display: block;
+      padding: 20px;
+      border: 1px solid white;
+      font-weight: bold;
+      color: white;
+      text-decoration: none;
+    }
+
+    .buy-link:hover {
+      color: #ed2224;
+      background: white;
+    }
+
+    .buy-link h4 {
+      font-weight: inherit;
+      margin-top: 0.5em;
+      margin-bottom: 0.7em;
     }
 
     figure {
@@ -300,6 +330,17 @@
         </ul>
       </div>
     </div>
+    <p>
+      <span class="large"><span class="cursive">an elegant</span>$45</span>
+    </p>
+    <a class="buy-link" href="https://store.mmuseumm.com">
+      click here to
+      <h4 class="big">ORDER<span class="cursive raisebaseline"> your </span>MMUSEUMM<br>
+      2020 CATALOG NOW</h4>
+      thank you for supporting mmuseumm<br>
+      a non-profit organization<br>
+      for public benefit
+    </a>
   </div>
 </body>
 </html>
