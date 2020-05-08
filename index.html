@@ -41,6 +41,7 @@
       margin: 0 !important;
       padding: 0;
       width: 100vw;
+      height: auto;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -51,12 +52,15 @@
 
       background-color: #ed2224;
 
-      font-family: 'Times New Roman', Times, serif;
-      color: white !important;
       text-align: center;
       font-variant: small-caps;
       font-feature-settings: "smcp";
       letter-spacing: 0.1em;
+    }
+
+    body * {
+      color: white !important;
+      font-family: 'Times New Roman', Times, serif !important;
     }
 
     h1, h2, h3, h4, h5, h6 {
@@ -65,7 +69,7 @@
     }
 
     .cursive {
-      font-family: "Chopin Script", "Snell Roundhand", cursive;
+      font-family: "Chopin Script", "Snell Roundhand", cursive !important;
       font-size: 1.55em;
       font-variant: none;
       letter-spacing: 0 !important;
@@ -271,7 +275,7 @@
 
   </style>
 </head>
-<body>
+<div id="takeover">
   <h1>
     <span class="huge cursive">normally</span><br>
     <span class="cursive">this</span> would be your invitation<br>
@@ -342,5 +346,6 @@
       for public benefit
     </a>
   </div>
-</body>
+</div>
+
 </html>
