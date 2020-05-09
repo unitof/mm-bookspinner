@@ -54,7 +54,7 @@
   }
 
   :root {
-    --mmbook-width: 50vw; /* 6in, reference */
+    --mmbook-width: 40vmin; /* 6in, reference */
     --mmbook-height: calc(var(--mmbook-width) * 1.5); /* 9in = 1.5 × reference;  */
     --mmbook-thickness: calc(var(--mmbook-height) * 0.137888889); /* 1.241in = 1.241/9 × reference */
     /*font-size: min(48px, 4vw);*/ /* doesn't work on Safari */
@@ -114,6 +114,7 @@
   #takeover .large {
     font-size: 2rem;
     letter-spacing: 0.1em;
+    line-height: 0.7em;
   }
 
   #takeover .big {
@@ -122,7 +123,12 @@
   }
 
   #takeover .small {
-    font-size: 0.7em;
+    font-size: 0.8em;
+  }
+
+  #takeover .tiny {
+    font-size: 0.5em;
+    letter-spacing: 0.1em;
   }
 
   #takeover .strong {
@@ -170,7 +176,10 @@
   }
 
   #takeover .book-section .book-hero .book-spinner {
-    flex: 0 0 auto;
+    flex: 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   #takeover .book-section .book-hero .book-features {
@@ -179,13 +188,23 @@
     padding-left: 1.5rem;
   }
 
+  #takeover .book-features h4 {
+    /* align with top of book */
+    line-height: 0.5em;
+    margin-top: 0;
+  }
+
   #takeover .book-features ul {
     list-style: none;
-    padding: 0;
+    margin: 0;
   }
 
   #takeover .book-features li {
     margin: 0.5em 0;
+  }
+
+  #takeover .book-features li:last-child {
+    margin-bottom: 0;
   }
 
   #takeover .buy-link {
@@ -224,6 +243,12 @@
     height: var(--mmbook-height);
     perspective: 24in;
     /*border: 4px solid black;*/
+    margin: 50px;
+    margin-top: 0;
+  }
+
+  #takeover .book-spinner figcaption {
+    text-align: center;
   }
 
   #takeover .book-spinner .case {
@@ -307,29 +332,23 @@
 <div id="takeover">
   <h1>
     <span class="huge cursive">normally</span><br>
-    <span class="cursive">this</span> would be your invitation<br>
-    <span class="small cursive">to the</span><br>
+    this would be your invitation<br>
+    <span class="cursive">to the</span><br>
     <span class="large">Mmuseumm 2020<br>Opening Ceremonies</span>
   </h1>
   <h2>
-    however,<span class="small cursive"> there is a </span><span class="strong wavy">pandemic.</span><br>
-    <span class="small cursive">so </span>this year<span class="small cursive"> is </span>a little different
+    however,<span class="small"> there is a </span><span class="strong">pandemic</span><br>
+    so you cannot come here to see<br>
+    the new exhibitions just yet.
   </h2>
   <p>
-    <span class="small cursive">the </span>new 2020 season<span class="small cursive"> of</span><br>
-    world-wandering exhibitions<br>
-    <span class="small cursive">is </span>installed<span class="small cursive"> but</span><br>
-    mmuseumm<span class="small cursive"> is </span><span class="italic">temporarily</span> closed.
-  </p>
-  <p>
-    <span class="large">so</span>, we<span class="cursive small"> are </span>starting off<span class="cursive small"> this</span><br>
-    season<span class="cursive small"> by </span>offering you<span class="cursive small"> our </span>new
+    <span class="large strong">but starting today</span><br>
+    you can bring home the entire<br>
+    mmuseumm 2020 collection
   </p>
   <div class="book-section">
-    <h3 class="header">
-      <span class="cursive">limited edition</span><br>
-      mmuseumm 2020<br>
-      <span class="large strong">JUMBO CATALOG</span>
+    <h3 class="strong">
+      NOW AVAILABLE FOR ORDER
     </h3>
     <div class="book-hero">
       <div class="book-spinner">
@@ -343,25 +362,22 @@
             <figure class="face tail"></figure>
           </div>
         </div>
+        <figcaption class="tiny">Over 300 pages of eye-opening objects!</figcaption>
       </div>
       <div class="book-features">
-        <p class="small">
-          Over 300 pages of revealing objects!
-        </p>
-        <p class="small">includes:</p>
-        <ul>
-          <li class="small normalcaps">The Power of Power</li>
+        <h4 class="cursive">limited edition</h4>
+        <span class="large strong">jumbo catalog</span>
+        <p class="small" style="margin-bottom: 0;">includes:</p>
+        <ul class="small">
           <li class="small normalcaps">Pipelines of Complicity</li>
           <li class="small normalcaps">Not Allowed!</li>
           <li class="small normalcaps">Human Exchanges</li>
           <li class="small normalcaps">The Final Straw</li>
           <li class="small normalcaps">Hong Kong Protest Tools</li>
-          <li class="small normalcaps">Children Lead the Way</li>
           <li class="small normalcaps">The Value of a Dollar</li>
-          <li class="small normalcaps">Losing Time</li>
           <li class="small normalcaps">Modern Slavery?</li>
           <li class="small normalcaps">Natural Nature</li>
-          <li>and more!</li>
+          <li class="small">And more!</li>
         </ul>
       </div>
     </div>
