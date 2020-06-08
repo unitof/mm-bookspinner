@@ -79,6 +79,22 @@
     font-weight: normal;
   }
 
+  #floating-home {
+    display: block;
+    font-weight: normal;
+    font-size: 18px;
+    position: fixed;
+    margin: 0;
+    top: 20px;
+    right: 20px;
+  }
+
+  @media screen and (max-width: 1000px) {
+    #floating-home {
+      display: none;
+    }
+  }
+
   .takeover {
     text-align: center;
     font-variant: small-caps;
@@ -350,6 +366,7 @@
 <!-- SQSP: Code Block at top of page -->
 
 <div class="takeover">
+  <a id="floating-home" href="/welcome" class="box-link">HOME</a>
   <p>Due to pandemic, Mmuseumm is temporarily closed.</p>
   <div class="book-section">
     <div class="book-hero">
