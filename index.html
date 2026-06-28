@@ -51,9 +51,23 @@
   }
 
   :root {
-    --mmbook-width: 45vmin; /* 6in, reference */
-    --mmbook-height: calc(var(--mmbook-width) * 1.5); /* 9in = 1.5 × reference;  */
-    --mmbook-thickness: calc(var(--mmbook-height) * 0.137888889); /* 1.241in = 1.241/9 × reference */
+    --mmbook-inch: 7.2vmin;
+
+    /* 6.25in × 9.25in case, with 1/8in boards. */
+    --mmbook-width: calc(var(--mmbook-inch) * 6.25);
+    --mmbook-height: calc(var(--mmbook-inch) * 9.25);
+    --mmbook-cover-thickness: calc(var(--mmbook-inch) * 0.125);
+
+    /* 6in × 9in × 7/16in text block. */
+    --mmbook-page-width: calc(var(--mmbook-inch) * 6);
+    --mmbook-page-height: calc(var(--mmbook-inch) * 9);
+    --mmbook-page-thickness: calc(var(--mmbook-inch) * 0.4375);
+    --mmbook-overhang: calc((var(--mmbook-height) - var(--mmbook-page-height)) / 2);
+
+    /* The 9/16in spine is centered across the 11/16in closed depth. */
+    --mmbook-thickness: calc(var(--mmbook-page-thickness) + var(--mmbook-cover-thickness) + var(--mmbook-cover-thickness));
+    --mmbook-spine-width: calc(var(--mmbook-inch) * 0.5625);
+    --mmbook-spine-inset: calc((var(--mmbook-thickness) - var(--mmbook-spine-width)) / 2);
     /*font-size: min(48px, 4vw);*/ /* doesn't work on Safari */
     font-size: 4vmin;
   }
@@ -297,55 +311,185 @@
     margin-right: 200px;
   }
 
-  .takeover .book-spinner .face {
+  .takeover .book-spinner .book {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .takeover .book-spinner .prism {
+    position: absolute;
+    width: var(--prism-width);
+    height: var(--prism-height);
+    transform-style: preserve-3d;
+  }
+
+  .takeover .book-spinner .surface {
     background-color: #f3f3f3;
     position: absolute;
     transform-origin: 0 0;
     background-size: cover;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
   }
 
-  .takeover .book-spinner .face.front {
-    background-image: url(https://mm-bookspinner.now.sh/img/front.svg);
-    width: var(--mmbook-width);
-    height: var(--mmbook-height);
-    transform: rotateY( 0 ) translateZ( 0 );
+  .takeover .book-spinner .surface.is-front,
+  .takeover .book-spinner .surface.is-back {
+    width: var(--prism-width);
+    height: var(--prism-height);
   }
-  .takeover .book-spinner .face.foreedge {
-    background-image: url(https://mm-bookspinner.now.sh/img/foreedge.jpg);
-    width: var(--mmbook-thickness);
-    height: var(--mmbook-height);
-    transform: rotateY(90deg) translateZ( var(--mmbook-width) );
+
+  .takeover .book-spinner .surface.is-front {
+    transform: translateZ(0);
   }
-  .takeover .book-spinner .face.back {
-    background-image: url(https://mm-bookspinner.now.sh/img/back.svg);
-    transform-origin: 50% 50%; /* eliminates need for translateX(100%) */
-    width: var(--mmbook-width);
-    height: var(--mmbook-height);
-    transform: rotateY(180deg) translateZ( var(--mmbook-thickness) );
+
+  .takeover .book-spinner .surface.is-back {
+    transform-origin: 50% 50%;
+    transform: rotateY(180deg) translateZ(var(--prism-depth));
   }
-  .takeover .book-spinner .face.spine {
-    background-image: url(https://mm-bookspinner.now.sh/img/spine.svg);
-    width: var(--mmbook-thickness);
-    height: var(--mmbook-height);
-    transform: rotateY(-90deg) translateX(-100%) translateZ( 0 );
+
+  .takeover .book-spinner .surface.is-right,
+  .takeover .book-spinner .surface.is-left {
+    width: var(--prism-depth);
+    height: var(--prism-height);
   }
-  .takeover .book-spinner .face.head {
-    background-image: url(https://mm-bookspinner.now.sh/img/foreedge.jpg);
-    background-position-x: 100%;
-    width: var(--mmbook-thickness);
-    height: var(--mmbook-width);
+
+  .takeover .book-spinner .surface.is-right {
+    transform: rotateY(90deg) translateZ(var(--prism-width));
+  }
+
+  .takeover .book-spinner .surface.is-left {
+    transform: rotateY(-90deg) translateX(-100%);
+  }
+
+  .takeover .book-spinner .surface.is-top,
+  .takeover .book-spinner .surface.is-bottom {
+    width: var(--prism-depth);
+    height: var(--prism-width);
+  }
+
+  .takeover .book-spinner .surface.is-top {
     transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%);
   }
-  .takeover .book-spinner .face.tail {
-    background-image: url(https://mm-bookspinner.now.sh/img/foreedge.jpg);
-    width: var(--mmbook-thickness);
-    height: var(--mmbook-width);
-    transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%) translateZ( var(--mmbook-height) );
+
+  .takeover .book-spinner .surface.is-bottom {
+    transform: rotateX(-90deg) rotateZ(90deg) translateY(-100%) translateZ(var(--prism-height));
+  }
+
+  .takeover .book-spinner .text-block {
+    --prism-width: var(--mmbook-page-width);
+    --prism-height: var(--mmbook-page-height);
+    --prism-depth: var(--mmbook-page-thickness);
+    transform: translate3d(0, var(--mmbook-overhang), calc(-1 * var(--mmbook-cover-thickness)));
+  }
+
+  .takeover .book-spinner .text-block .surface {
+    background-color: #fafafa;
+  }
+
+  .takeover .book-spinner .text-block .surface.is-right,
+  .takeover .book-spinner .text-block .surface.is-top,
+  .takeover .book-spinner .text-block .surface.is-bottom {
+    background-image: url(/img/foreedge.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .takeover .book-spinner .text-block .surface.is-top {
+    background-position-x: 100%;
+  }
+
+  .takeover .book-spinner .cover-board {
+    --prism-width: var(--mmbook-width);
+    --prism-height: var(--mmbook-height);
+    --prism-depth: var(--mmbook-cover-thickness);
+  }
+
+  .takeover .book-spinner .cover-board .surface,
+  .takeover .book-spinner .spine-board .surface {
+    background-color: #e8e8e8;
+  }
+
+  .takeover .book-spinner .front-board {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .takeover .book-spinner .front-board .surface.is-front {
+    background-image: url(/img/front.svg);
+  }
+
+  .takeover .book-spinner .front-board .surface.is-front::after,
+  .takeover .book-spinner .back-board .surface.is-back::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: calc(var(--mmbook-width) * 0.025);
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.32) 24%,
+      rgba(80, 76, 76, 0.18) 48%,
+      rgba(255, 255, 255, 0.24) 72%,
+      rgba(255, 255, 255, 0) 100%
+    );
+  }
+
+  .takeover .book-spinner .front-board .surface.is-front::after {
+    left: calc(var(--mmbook-width) * 0.018);
+    animation: front-groove-light 10s linear infinite;
+  }
+
+  .takeover .book-spinner .back-board {
+    transform: translate3d(0, 0, calc(var(--mmbook-cover-thickness) - var(--mmbook-thickness)));
+  }
+
+  .takeover .book-spinner .back-board .surface.is-back {
+    background-image: url(/img/back.svg);
+  }
+
+  .takeover .book-spinner .back-board .surface.is-back::after {
+    right: calc(var(--mmbook-width) * 0.018);
+    transform: scaleX(-1);
+    animation: back-groove-light 10s linear infinite;
+  }
+
+  .takeover .book-spinner .spine-board {
+    --prism-width: var(--mmbook-cover-thickness);
+    --prism-height: var(--mmbook-height);
+    --prism-depth: var(--mmbook-spine-width);
+    transform: translate3d(
+      calc(-1 * var(--mmbook-cover-thickness)),
+      0,
+      calc(-1 * var(--mmbook-spine-inset))
+    );
+  }
+
+  .takeover .book-spinner .spine-board .surface.is-left {
+    background-image: url(/img/spine.svg);
+  }
+
+  @keyframes front-groove-light {
+    0%, 100% {
+      opacity: 0.9;
+    }
+    25%, 75% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+
+  @keyframes back-groove-light {
+    0%, 100% {
+      opacity: 0.6;
+    }
+    25%, 75% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.9;
+    }
   }
 
   @keyframes revolve {
@@ -373,13 +517,39 @@
       <div class="book-spinner">
         <div class="scene">
             <div class="case">
-              <a href="https://store.mmuseumm.com/product/catalog/80">
-                <figure class="face front"></figure>
-                <figure class="face foreedge"></figure>
-                <figure class="face back"></figure>
-                <figure class="face spine"></figure>
-                <figure class="face head"></figure>
-                <figure class="face tail"></figure>
+              <a class="book" href="https://store.mmuseumm.com/product/catalog/80">
+                <div class="prism text-block">
+                  <figure class="surface is-front"></figure>
+                  <figure class="surface is-right"></figure>
+                  <figure class="surface is-back"></figure>
+                  <figure class="surface is-left"></figure>
+                  <figure class="surface is-top"></figure>
+                  <figure class="surface is-bottom"></figure>
+                </div>
+                <div class="prism cover-board front-board">
+                  <figure class="surface is-front"></figure>
+                  <figure class="surface is-right"></figure>
+                  <figure class="surface is-back"></figure>
+                  <figure class="surface is-left"></figure>
+                  <figure class="surface is-top"></figure>
+                  <figure class="surface is-bottom"></figure>
+                </div>
+                <div class="prism cover-board back-board">
+                  <figure class="surface is-front"></figure>
+                  <figure class="surface is-right"></figure>
+                  <figure class="surface is-back"></figure>
+                  <figure class="surface is-left"></figure>
+                  <figure class="surface is-top"></figure>
+                  <figure class="surface is-bottom"></figure>
+                </div>
+                <div class="prism spine-board">
+                  <figure class="surface is-front"></figure>
+                  <figure class="surface is-right"></figure>
+                  <figure class="surface is-back"></figure>
+                  <figure class="surface is-left"></figure>
+                  <figure class="surface is-top"></figure>
+                  <figure class="surface is-bottom"></figure>
+                </div>
               </a>
             </div>
         </div>
