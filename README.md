@@ -25,9 +25,11 @@ This writes:
 The red outputs use `#fd2224`. They contain only the spinner; the surrounding
 marketing copy, including “MMUSEUMM 2020,” is hidden by the capture page. The
 MP4 uses high-quality H.264 at CRF 12 with animation tuning to preserve crisp
-edges. It retains broadly compatible `yuv420p` video and is prepared for fast
-web start. Like any MP4, its player controls whether playback repeats; its
-first and last frames are sampled so repeating it is seamless.
+edges. It retains broadly compatible `yuv420p` video, with an explicit Rec. 709
+conversion and sRGB transfer metadata so browsers reproduce the source colors,
+and is prepared for fast web start. Like any MP4, its player controls whether
+playback repeats; its first and last frames are sampled so repeating it is
+seamless.
 
 The loop duration is read from the CSS animation. The script captures at the
 highest requested output rate (60 fps by default), derives the GIF and APNG at
