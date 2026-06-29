@@ -108,7 +108,8 @@ try {
     await setAnimationTime(cdp, time);
     bounds = unionBounds(bounds, await measureBook(cdp));
   }
-  const clip = paddedClip(bounds, options.margin, options.padding, options.height);
+  const captureHeight = Math.max(options.height, options.mp4 ? options.videoSize : 0);
+  const clip = paddedClip(bounds, options.margin, options.padding, captureHeight);
 
   for (let frame = 0; frame < frameCount; frame += 1) {
     const time = frame * 1000 / captureFps;
@@ -130,11 +131,11 @@ try {
   process.stdout.write('\n');
   cdp.close();
 
-  await encodeGif(frameDirectory, options.output, captureFps, options.fps);
+  await encodeGif(frameDirectory, options.output, captureFps, options.fps, null, options.height);
   console.log(`GIF: ${options.output}`);
 
   if (options.apng) {
-    await encodeApng(frameDirectory, options.apng, captureFps, options.fps);
+    await encodeApng(frameDirectory, options.apng, captureFps, options.fps, null, options.height);
     console.log(`APNG: ${options.apng}`);
   }
 
@@ -157,7 +158,7 @@ try {
   if (options.mp4) {
     await encodeMp4(frameDirectory, options.mp4, captureFps, options.videoFps, {
       background: options.background,
-      size: options.squareSize,
+      size: options.videoSize,
     });
     console.log(`MP4: ${options.mp4}`);
   }
@@ -189,6 +190,7 @@ function parseArguments(args) {
     redApng: path.resolve('output/book-spinner-red.png'),
     mp4: path.resolve('output/book-spinner-red.mp4'),
     videoFps: 60,
+    videoSize: 2400,
     squareSize: 1200,
     background: '#c41b1b',
     source: null,
@@ -209,6 +211,7 @@ Options:
   --mp4 <file>          Square red H.264 video (default: output/book-spinner-red.mp4)
   --fps <number>        GIF and APNG frame rate (default: 24)
   --video-fps <number>  MP4 frame rate (default: 60)
+  --video-size <px>     MP4 width and height (default: 2400)
   --duration <seconds>  Loop duration override (default: read from CSS)
   --viewport <pixels>   Square layout viewport (default: 1600)
   --height <pixels>     Final animation height (default: 1200)
@@ -251,6 +254,7 @@ Options:
     else if (argument === '--mp4') values.mp4 = path.resolve(value);
     else if (argument === '--fps') values.fps = positiveNumber(value, argument);
     else if (argument === '--video-fps') values.videoFps = positiveNumber(value, argument);
+    else if (argument === '--video-size') values.videoSize = positiveNumber(value, argument);
     else if (argument === '--duration') values.duration = positiveNumber(value, argument);
     else if (argument === '--viewport') values.viewport = positiveNumber(value, argument);
     else if (argument === '--height') values.height = positiveNumber(value, argument);
@@ -266,10 +270,11 @@ Options:
 
   if (!Number.isInteger(values.fps)) throw new Error('--fps must be an integer');
   if (!Number.isInteger(values.videoFps)) throw new Error('--video-fps must be an integer');
+  if (!Number.isInteger(values.videoSize)) throw new Error('--video-size must be an integer');
   if (!Number.isInteger(values.viewport)) throw new Error('--viewport must be an integer');
   if (!Number.isInteger(values.height)) throw new Error('--height must be an integer');
   if (!Number.isInteger(values.squareSize)) throw new Error('--square-size must be an integer');
-  if (values.mp4 && values.squareSize % 2 !== 0) throw new Error('--square-size must be even for H.264 output');
+  if (values.mp4 && values.videoSize % 2 !== 0) throw new Error('--video-size must be even for H.264 output');
   return values;
 }
 
@@ -472,11 +477,11 @@ function paddedClip(bounds, margin, padding, outputHeight) {
   };
 }
 
-async function encodeGif(frames, output, sourceFps, outputFps, square = null) {
+async function encodeGif(frames, output, sourceFps, outputFps, square = null, height = null) {
   await mkdir(path.dirname(output), { recursive: true });
   const frameFilter = square
     ? `${squareFilter(outputFps, square)}[composite];[composite]split[frames][palette_input]`
-    : `[0:v]fps=${outputFps},split[frames][palette_input]`;
+    : `[0:v]fps=${outputFps},scale=-2:${height}:flags=lanczos,split[frames][palette_input]`;
   await run('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-y',
     '-framerate', String(sourceFps),
@@ -488,7 +493,7 @@ async function encodeGif(frames, output, sourceFps, outputFps, square = null) {
   ]);
 }
 
-async function encodeApng(frames, output, sourceFps, outputFps, square = null) {
+async function encodeApng(frames, output, sourceFps, outputFps, square = null, height = null) {
   await mkdir(path.dirname(output), { recursive: true });
   const args = [
     '-hide_banner', '-loglevel', 'error', '-y',
@@ -496,7 +501,7 @@ async function encodeApng(frames, output, sourceFps, outputFps, square = null) {
     '-i', path.join(frames, 'frame-%04d.png'),
   ];
   if (square) args.push('-filter_complex', `${squareFilter(outputFps, square)}[out]`, '-map', '[out]');
-  else args.push('-vf', `fps=${outputFps}`);
+  else args.push('-vf', `fps=${outputFps},scale=-2:${height}:flags=lanczos`);
   args.push(
     '-plays', '0',
     '-f', 'apng',
@@ -516,7 +521,8 @@ async function encodeMp4(frames, output, sourceFps, outputFps, square) {
     '-an',
     '-c:v', 'libx264',
     '-preset', 'slow',
-    '-crf', '18',
+    '-tune', 'animation',
+    '-crf', '12',
     '-movflags', '+faststart',
     '-video_track_timescale', '60000',
     output,

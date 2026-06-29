@@ -20,13 +20,14 @@ This writes:
   1200 pixels tall
 - `output/book-spinner-red.gif`: 1200×1200 GIF on the site red
 - `output/book-spinner-red.png`: 1200×1200 animated PNG on the site red
-- `output/book-spinner-red.mp4`: 1200×1200, 60 fps H.264 video on the site red
+- `output/book-spinner-red.mp4`: 2400×2400, 60 fps H.264 video on the site red
 
 The red outputs use `#fd2224`. They contain only the spinner; the surrounding
 marketing copy, including “MMUSEUMM 2020,” is hidden by the capture page. The
-MP4 uses broadly compatible `yuv420p` video and is prepared for fast web
-start. Like any MP4, its player controls whether playback repeats; its first
-and last frames are sampled so repeating it is seamless.
+MP4 uses high-quality H.264 at CRF 12 with animation tuning to preserve crisp
+edges. It retains broadly compatible `yuv420p` video and is prepared for fast
+web start. Like any MP4, its player controls whether playback repeats; its
+first and last frames are sampled so repeating it is seamless.
 
 The loop duration is read from the CSS animation. The script captures at the
 highest requested output rate (60 fps by default), derives the GIF and APNG at
@@ -35,8 +36,8 @@ bounds for every output frame. Transparent outputs retain 10% margin on each
 side. Square outputs preserve that complete view, center it, and fill the rest
 of the 1200×1200 canvas with red.
 
-Useful options include `--fps`, `--video-fps`, `--duration`, `--height`,
-`--square-size`, `--background`, `--margin`, `--padding`, and `--keep-frames`.
+Useful options include `--fps`, `--video-fps`, `--video-size`, `--duration`,
+`--height`, `--square-size`, `--background`, `--margin`, `--padding`, and `--keep-frames`.
 Use `--no-apng`, `--no-red`, or `--no-mp4` to skip output groups. Run with
 `--help` for the complete list.
 
