@@ -57,6 +57,7 @@
     --mmbook-width: calc(var(--mmbook-inch) * 6.25);
     --mmbook-height: calc(var(--mmbook-inch) * 9.25);
     --mmbook-cover-thickness: calc(var(--mmbook-inch) * 0.125);
+    --mmbook-spine-thickness: calc(var(--mmbook-inch) * 0.0625);
 
     /* 6in × 9in × 7/16in text block. */
     --mmbook-page-width: calc(var(--mmbook-inch) * 6);
@@ -454,11 +455,11 @@
   }
 
   .takeover .book-spinner .spine-board {
-    --prism-width: var(--mmbook-cover-thickness);
+    --prism-width: var(--mmbook-spine-thickness);
     --prism-height: var(--mmbook-height);
     --prism-depth: var(--mmbook-spine-width);
     transform: translate3d(
-      calc(-1 * var(--mmbook-cover-thickness)),
+      calc(-1 * var(--mmbook-spine-thickness)),
       0,
       calc(-1 * var(--mmbook-spine-inset))
     );
