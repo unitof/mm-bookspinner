@@ -22,7 +22,7 @@ try {
   await mkdir(frameDirectory, { recursive: true });
   await mkdir(profileDirectory, { recursive: true });
 
-  const pageUrl = await createCapturePage(root, workDirectory);
+  const pageUrl = await createCapturePage(root, workDirectory, options.source);
 
   console.log('Starting Chrome...');
   chrome = spawn(chromePath, [
@@ -98,19 +98,20 @@ try {
   if (!Number.isFinite(duration) || duration <= 0) {
     throw new Error('Could not determine the CSS animation duration; pass --duration explicitly.');
   }
-  const frameCount = Math.round(duration * options.fps);
+  const captureFps = Math.max(options.fps, options.mp4 ? options.videoFps : 0);
+  const frameCount = Math.round(duration * captureFps);
 
   console.log('Measuring the complete rotation...');
   let bounds;
   for (let frame = 0; frame < frameCount; frame += 1) {
-    const time = frame * 1000 / options.fps;
+    const time = frame * 1000 / captureFps;
     await setAnimationTime(cdp, time);
     bounds = unionBounds(bounds, await measureBook(cdp));
   }
   const clip = paddedClip(bounds, options.margin, options.padding, options.height);
 
   for (let frame = 0; frame < frameCount; frame += 1) {
-    const time = frame * 1000 / options.fps;
+    const time = frame * 1000 / captureFps;
     await setAnimationTime(cdp, time);
 
     const screenshot = await cdp.send('Page.captureScreenshot', {
@@ -122,19 +123,43 @@ try {
     const filename = `frame-${String(frame).padStart(4, '0')}.png`;
     await writeFile(path.join(frameDirectory, filename), Buffer.from(screenshot.data, 'base64'));
 
-    if ((frame + 1) % options.fps === 0 || frame + 1 === frameCount) {
+    if ((frame + 1) % captureFps === 0 || frame + 1 === frameCount) {
       process.stdout.write(`Captured ${frame + 1}/${frameCount} frames\r`);
     }
   }
   process.stdout.write('\n');
   cdp.close();
 
-  await encodeGif(frameDirectory, options.output, options.fps);
+  await encodeGif(frameDirectory, options.output, captureFps, options.fps);
   console.log(`GIF: ${options.output}`);
 
   if (options.apng) {
-    await encodeApng(frameDirectory, options.apng, options.fps);
+    await encodeApng(frameDirectory, options.apng, captureFps, options.fps);
     console.log(`APNG: ${options.apng}`);
+  }
+
+  if (options.redGif) {
+    await encodeGif(frameDirectory, options.redGif, captureFps, options.fps, {
+      background: options.background,
+      size: options.squareSize,
+    });
+    console.log(`Red GIF: ${options.redGif}`);
+  }
+
+  if (options.redApng) {
+    await encodeApng(frameDirectory, options.redApng, captureFps, options.fps, {
+      background: options.background,
+      size: options.squareSize,
+    });
+    console.log(`Red APNG: ${options.redApng}`);
+  }
+
+  if (options.mp4) {
+    await encodeMp4(frameDirectory, options.mp4, captureFps, options.videoFps, {
+      background: options.background,
+      size: options.squareSize,
+    });
+    console.log(`MP4: ${options.mp4}`);
   }
 
   if (options.keepFrames) {
@@ -159,7 +184,14 @@ function parseArguments(args) {
     margin: 0.1,
     padding: 0,
     output: path.resolve('output/book-spinner.gif'),
-    apng: null,
+    apng: path.resolve('output/book-spinner.png'),
+    redGif: path.resolve('output/book-spinner-red.gif'),
+    redApng: path.resolve('output/book-spinner-red.png'),
+    mp4: path.resolve('output/book-spinner-red.mp4'),
+    videoFps: 60,
+    squareSize: 1200,
+    background: '#fd2224',
+    source: null,
     keepFrames: null,
     chrome: null,
   };
@@ -171,17 +203,41 @@ function parseArguments(args) {
 
 Options:
   --output <file>       GIF destination (default: output/book-spinner.gif)
-  --apng <file>         Also write a full-alpha APNG
-  --fps <number>        Frames per second (default: 24)
+  --apng <file>         Full-alpha APNG (default: output/book-spinner.png)
+  --red-gif <file>      Square red GIF (default: output/book-spinner-red.gif)
+  --red-apng <file>     Square red APNG (default: output/book-spinner-red.png)
+  --mp4 <file>          Square red H.264 video (default: output/book-spinner-red.mp4)
+  --fps <number>        GIF and APNG frame rate (default: 24)
+  --video-fps <number>  MP4 frame rate (default: 60)
   --duration <seconds>  Loop duration override (default: read from CSS)
   --viewport <pixels>   Square layout viewport (default: 1600)
   --height <pixels>     Final animation height (default: 1200)
+  --square-size <px>    Red output width and height (default: 1200)
+  --background <hex>    Red output background (default: #fd2224)
+  --source <file>       HTML source (default: index.html, then text.html)
   --margin <fraction>   Margin per side, relative to book size (default: 0.1)
   --padding <pixels>    Additional pre-scale padding per side (default: 0)
   --keep-frames <dir>   Preserve the transparent PNG frame sequence
   --chrome <path>       Chrome/Chromium executable override
+  --no-apng             Skip the transparent APNG
+  --no-red              Skip both square red GIF and APNG
+  --no-mp4              Skip the MP4
 `);
       process.exit(0);
+    }
+
+    if (argument === '--no-apng') {
+      values.apng = null;
+      continue;
+    }
+    if (argument === '--no-red') {
+      values.redGif = null;
+      values.redApng = null;
+      continue;
+    }
+    if (argument === '--no-mp4') {
+      values.mp4 = null;
+      continue;
     }
 
     const value = args[index + 1];
@@ -190,10 +246,17 @@ Options:
 
     if (argument === '--output') values.output = path.resolve(value);
     else if (argument === '--apng') values.apng = path.resolve(value);
+    else if (argument === '--red-gif') values.redGif = path.resolve(value);
+    else if (argument === '--red-apng') values.redApng = path.resolve(value);
+    else if (argument === '--mp4') values.mp4 = path.resolve(value);
     else if (argument === '--fps') values.fps = positiveNumber(value, argument);
+    else if (argument === '--video-fps') values.videoFps = positiveNumber(value, argument);
     else if (argument === '--duration') values.duration = positiveNumber(value, argument);
     else if (argument === '--viewport') values.viewport = positiveNumber(value, argument);
     else if (argument === '--height') values.height = positiveNumber(value, argument);
+    else if (argument === '--square-size') values.squareSize = positiveNumber(value, argument);
+    else if (argument === '--background') values.background = hexColor(value, argument);
+    else if (argument === '--source') values.source = path.resolve(value);
     else if (argument === '--margin') values.margin = nonnegativeNumber(value, argument);
     else if (argument === '--padding') values.padding = nonnegativeNumber(value, argument);
     else if (argument === '--keep-frames') values.keepFrames = value;
@@ -202,8 +265,11 @@ Options:
   }
 
   if (!Number.isInteger(values.fps)) throw new Error('--fps must be an integer');
+  if (!Number.isInteger(values.videoFps)) throw new Error('--video-fps must be an integer');
   if (!Number.isInteger(values.viewport)) throw new Error('--viewport must be an integer');
   if (!Number.isInteger(values.height)) throw new Error('--height must be an integer');
+  if (!Number.isInteger(values.squareSize)) throw new Error('--square-size must be an integer');
+  if (values.mp4 && values.squareSize % 2 !== 0) throw new Error('--square-size must be even for H.264 output');
   return values;
 }
 
@@ -217,6 +283,11 @@ function nonnegativeNumber(value, option) {
   const number = Number(value);
   if (!Number.isFinite(number) || number < 0) throw new Error(`${option} cannot be negative`);
   return number;
+}
+
+function hexColor(value, option) {
+  if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`${option} must be a six-digit hex color`);
+  return value.toLowerCase();
 }
 
 function findChrome() {
@@ -235,13 +306,21 @@ function findChrome() {
   return found;
 }
 
-async function createCapturePage(directory, temporaryDirectory) {
-  const source = await readFile(path.join(directory, 'index.html'), 'utf8');
+async function createCapturePage(directory, temporaryDirectory, requestedSource) {
+  const sourceFile = requestedSource ?? findCaptureSource(directory);
+  const source = await readFile(sourceFile, 'utf8');
   const imageBase = `${pathToFileURL(path.join(directory, 'img')).href}/`;
   const captureSource = source.replaceAll('url(/img/', `url(${imageBase}`);
   const filename = path.join(temporaryDirectory, 'capture.html');
   await writeFile(filename, captureSource);
   return pathToFileURL(filename).href;
+}
+
+function findCaptureSource(directory) {
+  const candidates = ['index.html', 'text.html'].map(filename => path.join(directory, filename));
+  const source = candidates.find(existsSync);
+  if (!source) throw new Error('No capture HTML found. Pass one with --source.');
+  return source;
 }
 
 async function waitForDebuggingPort(directory, processHandle) {
@@ -393,29 +472,62 @@ function paddedClip(bounds, margin, padding, outputHeight) {
   };
 }
 
-async function encodeGif(frames, output, fps) {
+async function encodeGif(frames, output, sourceFps, outputFps, square = null) {
   await mkdir(path.dirname(output), { recursive: true });
+  const frameFilter = square
+    ? `${squareFilter(outputFps, square)}[composite];[composite]split[frames][palette_input]`
+    : `[0:v]fps=${outputFps},split[frames][palette_input]`;
   await run('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-y',
-    '-framerate', String(fps),
+    '-framerate', String(sourceFps),
     '-i', path.join(frames, 'frame-%04d.png'),
     '-filter_complex',
-    'split[frames][palette_input];[palette_input]palettegen=reserve_transparent=1:transparency_color=ffffff[palette];[frames][palette]paletteuse=dither=sierra2_4a:alpha_threshold=128',
+    `${frameFilter};[palette_input]palettegen=${square ? 'stats_mode=full' : 'reserve_transparent=1:transparency_color=ffffff'}[palette];[frames][palette]paletteuse=dither=sierra2_4a:alpha_threshold=128`,
     '-loop', '0',
     output,
   ]);
 }
 
-async function encodeApng(frames, output, fps) {
+async function encodeApng(frames, output, sourceFps, outputFps, square = null) {
   await mkdir(path.dirname(output), { recursive: true });
-  await run('ffmpeg', [
+  const args = [
     '-hide_banner', '-loglevel', 'error', '-y',
-    '-framerate', String(fps),
+    '-framerate', String(sourceFps),
     '-i', path.join(frames, 'frame-%04d.png'),
+  ];
+  if (square) args.push('-filter_complex', `${squareFilter(outputFps, square)}[out]`, '-map', '[out]');
+  else args.push('-vf', `fps=${outputFps}`);
+  args.push(
     '-plays', '0',
     '-f', 'apng',
     output,
+  );
+  await run('ffmpeg', args);
+}
+
+async function encodeMp4(frames, output, sourceFps, outputFps, square) {
+  await mkdir(path.dirname(output), { recursive: true });
+  await run('ffmpeg', [
+    '-hide_banner', '-loglevel', 'error', '-y',
+    '-framerate', String(sourceFps),
+    '-i', path.join(frames, 'frame-%04d.png'),
+    '-filter_complex', `${squareFilter(outputFps, square, 'yuv420p')}[out]`,
+    '-map', '[out]',
+    '-an',
+    '-c:v', 'libx264',
+    '-preset', 'slow',
+    '-crf', '18',
+    '-movflags', '+faststart',
+    '-video_track_timescale', '60000',
+    output,
   ]);
+}
+
+function squareFilter(outputFps, { background, size }, pixelFormat = 'rgb24') {
+  const color = `0x${background.slice(1)}`;
+  return `[0:v]fps=${outputFps},scale=${size}:${size}:force_original_aspect_ratio=decrease:flags=lanczos[book];` +
+    `color=c=${color}:s=${size}x${size}:r=${outputFps}[background];` +
+    `[background][book]overlay=(W-w)/2:(H-h)/2:shortest=1:format=auto,format=${pixelFormat}`;
 }
 
 async function run(command, args) {
