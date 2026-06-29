@@ -1,0 +1,7 @@
+{
+	"name": "mm-bookspinner",
+	"author": "Jacob Ford <for.j@cobford.com>",
+	"scripts": {
+		"capture": "node scripts/capture-animation.mjs"
+	}
+}
