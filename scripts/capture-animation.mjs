@@ -190,7 +190,7 @@ function parseArguments(args) {
     mp4: path.resolve('output/book-spinner-red.mp4'),
     videoFps: 60,
     squareSize: 1200,
-    background: '#fd2224',
+    background: '#c41b1b',
     source: null,
     keepFrames: null,
     chrome: null,
