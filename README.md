@@ -13,6 +13,11 @@ Requirements: Node.js, Google Chrome or Chromium, and FFmpeg.
 node scripts/capture-animation.mjs
 ```
 
+Pass `--compress` to optimize both GIF outputs with Gifsicle. This uses
+optimization level 3 with low-loss level 20 and keeps the optimized file only
+when it is smaller. Run `npm install` first to install the optional Gifsicle
+dependency.
+
 This writes:
 
 - `output/book-spinner.gif`: transparent GIF, 24 fps and 1200 pixels tall
@@ -39,7 +44,8 @@ side. Square outputs preserve that complete view, center it, and fill the rest
 of the 1200×1200 canvas with red.
 
 Useful options include `--fps`, `--video-fps`, `--video-size`, `--duration`,
-`--height`, `--square-size`, `--background`, `--margin`, `--padding`, and `--keep-frames`.
+`--height`, `--square-size`, `--background`, `--margin`, `--padding`,
+`--keep-frames`, and `--compress`.
 Use `--no-apng`, `--no-red`, or `--no-mp4` to skip output groups. Run with
 `--help` for the complete list.
 

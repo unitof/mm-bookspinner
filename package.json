@@ -3,5 +3,8 @@
 	"author": "Jacob Ford <for.j@cobford.com>",
 	"scripts": {
 		"capture": "node scripts/capture-animation.mjs"
+	},
+	"devDependencies": {
+		"gifsicle": "^7.0.1"
 	}
 }

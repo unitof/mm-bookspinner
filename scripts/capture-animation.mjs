@@ -2,7 +2,7 @@
 
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -10,6 +10,7 @@ import { pathToFileURL } from 'node:url';
 const root = process.cwd();
 const options = parseArguments(process.argv.slice(2));
 const chromePath = options.chrome ?? findChrome();
+const gifsiclePath = options.compress ? await findGifsicle() : null;
 const workDirectory = await mkdtemp(path.join(tmpdir(), 'mm-bookspinner-'));
 const frameDirectory = path.join(workDirectory, 'frames');
 const profileDirectory = path.join(workDirectory, 'chrome-profile');
@@ -132,6 +133,7 @@ try {
   cdp.close();
 
   await encodeGif(frameDirectory, options.output, captureFps, options.fps, null, options.height);
+  if (gifsiclePath) await compressGif(options.output, gifsiclePath);
   console.log(`GIF: ${options.output}`);
 
   if (options.apng) {
@@ -144,6 +146,7 @@ try {
       background: options.background,
       size: options.squareSize,
     });
+    if (gifsiclePath) await compressGif(options.redGif, gifsiclePath);
     console.log(`Red GIF: ${options.redGif}`);
   }
 
@@ -196,6 +199,7 @@ function parseArguments(args) {
     source: null,
     keepFrames: null,
     chrome: null,
+    compress: false,
   };
 
   for (let index = 0; index < args.length; index += 1) {
@@ -222,6 +226,7 @@ Options:
   --padding <pixels>    Additional pre-scale padding per side (default: 0)
   --keep-frames <dir>   Preserve the transparent PNG frame sequence
   --chrome <path>       Chrome/Chromium executable override
+  --compress            Optimize GIF outputs with Gifsicle lossy level 20
   --no-apng             Skip the transparent APNG
   --no-red              Skip both square red GIF and APNG
   --no-mp4              Skip the MP4
@@ -240,6 +245,10 @@ Options:
     }
     if (argument === '--no-mp4') {
       values.mp4 = null;
+      continue;
+    }
+    if (argument === '--compress') {
+      values.compress = true;
       continue;
     }
 
@@ -491,6 +500,50 @@ async function encodeGif(frames, output, sourceFps, outputFps, square = null, he
     '-loop', '0',
     output,
   ]);
+}
+
+async function findGifsicle() {
+  let executable;
+  try {
+    ({ default: executable } = await import('gifsicle'));
+  } catch (error) {
+    throw new Error('--compress requires Gifsicle; run npm install first.', { cause: error });
+  }
+  if (!existsSync(executable)) {
+    throw new Error('--compress requires Gifsicle; run npm install first.');
+  }
+  return executable;
+}
+
+async function compressGif(output, executable) {
+  const optimized = `${output}.gifsicle`;
+  await rm(optimized, { force: true });
+
+  try {
+    const originalSize = (await stat(output)).size;
+    await run(executable, [
+      '--optimize=3',
+      '--lossy=20',
+      '--output', optimized,
+      output,
+    ]);
+    const optimizedSize = (await stat(optimized)).size;
+
+    if (optimizedSize < originalSize) {
+      await rename(optimized, output);
+      const savings = ((originalSize - optimizedSize) / originalSize * 100).toFixed(1);
+      console.log(`Gifsicle: ${formatBytes(originalSize)} -> ${formatBytes(optimizedSize)} (${savings}% smaller)`);
+    } else {
+      console.log('Gifsicle: original GIF is already as small as the optimized output');
+    }
+  } finally {
+    await rm(optimized, { force: true });
+  }
+}
+
+function formatBytes(bytes) {
+  if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${(bytes / 1024).toFixed(1)} KB`;
 }
 
 async function encodeApng(frames, output, sourceFps, outputFps, square = null, height = null) {
