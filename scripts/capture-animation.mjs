@@ -77,7 +77,7 @@ try {
       .book-features,
       .book-spinner figcaption,
       .book-section > .box-link,
-      body > .takeover:last-of-type {
+      body > .takeover:not(:has(.book-spinner)) {
         visibility: hidden !important;
       }
 
