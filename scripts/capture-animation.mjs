@@ -56,7 +56,7 @@ try {
   await cdp.send('Emulation.setDeviceMetricsOverride', {
     width: options.viewport,
     height: options.viewport,
-    deviceScaleFactor: options.scale,
+    deviceScaleFactor: 1,
     mobile: false,
   });
   await cdp.send('Emulation.setDefaultBackgroundColorOverride', {
@@ -80,6 +80,10 @@ try {
       body > .takeover:last-of-type {
         visibility: hidden !important;
       }
+
+      .book-spinner .scene {
+        margin: 200px !important;
+      }
     \`;
     document.head.append(captureStyle);
 
@@ -96,23 +100,18 @@ try {
   }
   const frameCount = Math.round(duration * options.fps);
 
-  const scene = await evaluate(cdp, `
-    return (() => {
-      const rect = document.querySelector('.book-spinner .scene').getBoundingClientRect();
-      return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-    })()
-  `);
-  const clip = paddedClip(scene, options.padding);
+  console.log('Measuring the complete rotation...');
+  let bounds;
+  for (let frame = 0; frame < frameCount; frame += 1) {
+    const time = frame * 1000 / options.fps;
+    await setAnimationTime(cdp, time);
+    bounds = unionBounds(bounds, await measureBook(cdp));
+  }
+  const clip = paddedClip(bounds, options.margin, options.padding, options.height);
 
   for (let frame = 0; frame < frameCount; frame += 1) {
     const time = frame * 1000 / options.fps;
-    await evaluate(cdp, `
-      document.getAnimations().forEach(animation => {
-        animation.pause();
-        animation.currentTime = ${time};
-      });
-      await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    `);
+    await setAnimationTime(cdp, time);
 
     const screenshot = await cdp.send('Page.captureScreenshot', {
       format: 'png',
@@ -155,9 +154,10 @@ function parseArguments(args) {
   const values = {
     fps: 24,
     duration: null,
-    viewport: 1200,
-    scale: 1,
-    padding: 24,
+    viewport: 1600,
+    height: 1200,
+    margin: 0.1,
+    padding: 0,
     output: path.resolve('output/book-spinner.gif'),
     apng: null,
     keepFrames: null,
@@ -174,9 +174,10 @@ Options:
   --apng <file>         Also write a full-alpha APNG
   --fps <number>        Frames per second (default: 24)
   --duration <seconds>  Loop duration override (default: read from CSS)
-  --viewport <pixels>   Square browser viewport (default: 1200)
-  --scale <number>      Device pixel ratio (default: 1)
-  --padding <pixels>    Transparent padding around the scene (default: 24)
+  --viewport <pixels>   Square layout viewport (default: 1600)
+  --height <pixels>     Final animation height (default: 1200)
+  --margin <fraction>   Margin per side, relative to book size (default: 0.1)
+  --padding <pixels>    Additional pre-scale padding per side (default: 0)
   --keep-frames <dir>   Preserve the transparent PNG frame sequence
   --chrome <path>       Chrome/Chromium executable override
 `);
@@ -192,7 +193,8 @@ Options:
     else if (argument === '--fps') values.fps = positiveNumber(value, argument);
     else if (argument === '--duration') values.duration = positiveNumber(value, argument);
     else if (argument === '--viewport') values.viewport = positiveNumber(value, argument);
-    else if (argument === '--scale') values.scale = positiveNumber(value, argument);
+    else if (argument === '--height') values.height = positiveNumber(value, argument);
+    else if (argument === '--margin') values.margin = nonnegativeNumber(value, argument);
     else if (argument === '--padding') values.padding = nonnegativeNumber(value, argument);
     else if (argument === '--keep-frames') values.keepFrames = value;
     else if (argument === '--chrome') values.chrome = value;
@@ -201,6 +203,7 @@ Options:
 
   if (!Number.isInteger(values.fps)) throw new Error('--fps must be an integer');
   if (!Number.isInteger(values.viewport)) throw new Error('--viewport must be an integer');
+  if (!Number.isInteger(values.height)) throw new Error('--height must be an integer');
   return values;
 }
 
@@ -340,13 +343,53 @@ async function evaluate(cdp, expression) {
   return result.result.value;
 }
 
-function paddedClip(scene, padding) {
+async function setAnimationTime(cdp, time) {
+  await evaluate(cdp, `
+    document.getAnimations().forEach(animation => {
+      animation.pause();
+      animation.currentTime = ${time};
+    });
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  `);
+}
+
+async function measureBook(cdp) {
+  return evaluate(cdp, `
+    const rectangles = Array.from(document.querySelectorAll('.book-spinner .surface'))
+      .map(surface => surface.getBoundingClientRect())
+      .filter(rectangle => rectangle.width > 0 && rectangle.height > 0);
+    return {
+      left: Math.min(...rectangles.map(rectangle => rectangle.left)),
+      top: Math.min(...rectangles.map(rectangle => rectangle.top)),
+      right: Math.max(...rectangles.map(rectangle => rectangle.right)),
+      bottom: Math.max(...rectangles.map(rectangle => rectangle.bottom)),
+    };
+  `);
+}
+
+function unionBounds(a, b) {
+  if (!a) return b;
   return {
-    x: Math.max(0, scene.x - padding),
-    y: Math.max(0, scene.y - padding),
-    width: scene.width + padding * 2,
-    height: scene.height + padding * 2,
-    scale: 1,
+    left: Math.min(a.left, b.left),
+    top: Math.min(a.top, b.top),
+    right: Math.max(a.right, b.right),
+    bottom: Math.max(a.bottom, b.bottom),
+  };
+}
+
+function paddedClip(bounds, margin, padding, outputHeight) {
+  const width = bounds.right - bounds.left;
+  const height = bounds.bottom - bounds.top;
+  const horizontalPadding = width * margin + padding;
+  const verticalPadding = height * margin + padding;
+  const clipHeight = height + verticalPadding * 2;
+
+  return {
+    x: bounds.left - horizontalPadding,
+    y: bounds.top - verticalPadding,
+    width: width + horizontalPadding * 2,
+    height: clipHeight,
+    scale: outputHeight / clipHeight,
   };
 }
 

@@ -16,9 +16,11 @@ node scripts/capture-animation.mjs \
 ```
 
 The loop duration is read from the CSS animation; capture defaults to 24 fps
-in a 1200-pixel viewport. Useful options include `--fps`, `--duration`,
-`--viewport`, `--scale`, `--padding`, and `--keep-frames`. Run with `--help`
-for the complete list.
+and a 1200-pixel-tall result. Before capturing, the script measures the book
+at every frame, uses the complete rotation bounds for every output frame, and
+adds 10% transparent margin on each side. Useful options include `--fps`,
+`--duration`, `--height`, `--margin`, `--padding`, and `--keep-frames`. Run
+with `--help` for the complete list.
 
 The GIF has native GIF transparency (one-bit alpha), with no chroma key. The
 optional APNG uses the same frames but preserves full alpha around antialiased
