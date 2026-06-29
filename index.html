@@ -59,16 +59,15 @@
     --mmbook-cover-thickness: calc(var(--mmbook-inch) * 0.125);
     --mmbook-spine-thickness: calc(var(--mmbook-inch) * 0.0625);
 
-    /* 6in × 9in × 7/16in text block. */
+    /* 6in × 9in text block, inset between the cover boards. */
     --mmbook-page-width: calc(var(--mmbook-inch) * 6);
     --mmbook-page-height: calc(var(--mmbook-inch) * 9);
-    --mmbook-page-thickness: calc(var(--mmbook-inch) * 0.4375);
     --mmbook-overhang: calc((var(--mmbook-height) - var(--mmbook-page-height)) / 2);
 
-    /* The 9/16in spine is centered across the 11/16in closed depth. */
-    --mmbook-thickness: calc(var(--mmbook-page-thickness) + var(--mmbook-cover-thickness) + var(--mmbook-cover-thickness));
-    --mmbook-spine-width: calc(var(--mmbook-inch) * 0.5625);
-    --mmbook-spine-inset: calc((var(--mmbook-thickness) - var(--mmbook-spine-width)) / 2);
+    /* The 9/16in spine includes both 1/8in cover boards. */
+    --mmbook-thickness: calc(var(--mmbook-inch) * 0.5625);
+    --mmbook-page-thickness: calc(var(--mmbook-thickness) - var(--mmbook-cover-thickness) - var(--mmbook-cover-thickness));
+    --mmbook-spine-width: var(--mmbook-thickness);
     /*font-size: min(48px, 4vw);*/ /* doesn't work on Safari */
     font-size: 4vmin;
   }
@@ -458,11 +457,7 @@
     --prism-width: var(--mmbook-spine-thickness);
     --prism-height: var(--mmbook-height);
     --prism-depth: var(--mmbook-spine-width);
-    transform: translate3d(
-      calc(-1 * var(--mmbook-spine-thickness)),
-      0,
-      calc(-1 * var(--mmbook-spine-inset))
-    );
+    transform: translate3d(calc(-1 * var(--mmbook-spine-thickness)), 0, 0);
   }
 
   .takeover .book-spinner .spine-board .surface {
