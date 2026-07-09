@@ -673,6 +673,8 @@ async function encodeMp4(frames, output, sourceFps, outputFps, square) {
     '-preset', 'slow',
     '-tune', 'animation',
     '-crf', '12',
+    '-g', '1',
+    '-bf', '0',
     '-color_range', 'tv',
     '-colorspace', 'bt709',
     '-color_primaries', 'bt709',
