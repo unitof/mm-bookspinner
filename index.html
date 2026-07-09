@@ -325,12 +325,14 @@
   }
 
   .takeover .book-spinner .surface {
-    background-color: #f3f3f3;
+    --surface-bg-color: #f3f3f3;
+    background-color: var(--surface-bg-color);
     position: absolute;
     transform-origin: 0 0;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     background-size: cover;
+    border: 0.1px solid var(--surface-bg-color); /* fix invisible seam */
   }
 
   .takeover .book-spinner .surface.is-front,
@@ -405,9 +407,12 @@
     --prism-depth: var(--mmbook-cover-thickness);
   }
 
-  .takeover .book-spinner .cover-board .surface,
+  .takeover .book-spinner .cover-board .surface {
+    --surface-bg-color: #e8e8e8;
+  }
+
   .takeover .book-spinner .spine-board .surface {
-    background-color: #e8e8e8;
+    --surface-bg-color: #000000;
   }
 
   .takeover .book-spinner .front-board {
