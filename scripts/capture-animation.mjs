@@ -67,6 +67,12 @@ try {
   console.log('Loading the spinner...');
   await cdp.send('Page.navigate', { url: pageUrl });
   await waitForDocument(cdp);
+  if (!options.background && (options.redGif || options.redGif50 || options.redApng || options.mp4)) {
+    options.background = cssColorToHex(await evaluate(cdp, `
+      return getComputedStyle(document.body).backgroundColor;
+    `), 'body background-color');
+  }
+
   await evaluate(cdp, `
     document.documentElement.style.background = 'transparent';
     document.body.style.setProperty('background', 'transparent', 'important');
@@ -195,7 +201,7 @@ function parseArguments(args) {
     videoFps: 60,
     videoSize: 2400,
     squareSize: 1200,
-    background: '#c41b1b',
+    background: null,
     source: null,
     keepFrames: null,
     chrome: null,
@@ -220,7 +226,7 @@ Options:
   --viewport <pixels>   Square layout viewport (default: 1600)
   --height <pixels>     Final animation height (default: 1200)
   --square-size <px>    Red output width and height (default: 1200)
-  --background <hex>    Red output background (default: #fd2224)
+  --background <hex>    Red output background override (default: read from CSS)
   --source <file>       HTML source (default: index.html, then text.html)
   --margin <fraction>   Margin per side, relative to book size (default: 0.1)
   --padding <pixels>    Additional pre-scale padding per side (default: 0)
@@ -302,6 +308,22 @@ function nonnegativeNumber(value, option) {
 function hexColor(value, option) {
   if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`${option} must be a six-digit hex color`);
   return value.toLowerCase();
+}
+
+function cssColorToHex(value, description) {
+  const match = value.match(/^rgba?\(\s*([0-9.]+)\s*(?:,|\s)\s*([0-9.]+)\s*(?:,|\s)\s*([0-9.]+)(?:\s*(?:,|\/)\s*([0-9.]+))?\s*\)$/i);
+  if (!match) throw new Error(`Could not read ${description} as an RGB color: ${value}`);
+
+  const [red, green, blue] = match.slice(1, 4).map(component => Number(component));
+  const alpha = match[4] === undefined ? 1 : Number(match[4]);
+  if ([red, green, blue, alpha].some(component => !Number.isFinite(component))) {
+    throw new Error(`Could not read ${description} as an RGB color: ${value}`);
+  }
+  if (alpha < 1) throw new Error(`${description} must be opaque for square outputs: ${value}`);
+
+  return `#${[red, green, blue]
+    .map(component => Math.round(component).toString(16).padStart(2, '0'))
+    .join('')}`;
 }
 
 function findChrome() {
