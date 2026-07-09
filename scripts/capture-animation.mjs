@@ -209,7 +209,7 @@ try {
 
 function parseArguments(args) {
   const values = {
-    fps: 24,
+    fps: 25,
     duration: null,
     viewport: 1600,
     height: 1200,
@@ -246,7 +246,7 @@ Options:
   --red-gif-50 <file>   50 fps square red GIF (default: output/book-spinner-red-50fps.gif)
   --red-apng <file>     Square red APNG (default: output/book-spinner-red.png)
   --mp4 <file>          Square red H.264 video (default: output/book-spinner-red.mp4)
-  --fps <number>        GIF and APNG frame rate (default: 24)
+  --fps <number>        GIF and APNG frame rate (default: 25)
   --video-fps <number>  MP4 frame rate (default: 60)
   --video-size <px>     MP4 width and height (default: 2400)
   --duration <seconds>  Loop duration override (default: read from CSS)
