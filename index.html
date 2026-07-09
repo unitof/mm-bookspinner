@@ -307,7 +307,7 @@
     position: relative;
     transform-style: preserve-3d;
     transform-origin: 50% 50% calc(-0.5 * var(--mmbook-thickness));
-    animation: revolve 10s linear infinite;
+    animation: revolve-cw reverse 10s linear infinite;
     margin-right: 200px;
   }
 
@@ -501,7 +501,7 @@
     }
   }
 
-  @keyframes revolve {
+  @keyframes revolve-cw {
     from {
       transform: rotateY(0);
     }
