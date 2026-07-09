@@ -8,6 +8,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const root = process.cwd();
+const gif50Fps = 50;
 const options = parseArguments(process.argv.slice(2));
 const chromePath = options.chrome ?? findChrome();
 const gifsiclePath = options.compress ? await findGifsicle() : null;
@@ -105,13 +106,17 @@ try {
   if (!Number.isFinite(duration) || duration <= 0) {
     throw new Error('Could not determine the CSS animation duration; pass --duration explicitly.');
   }
-  const captureFps = Math.max(options.fps, options.mp4 ? options.videoFps : 0);
+  const captureFps = Math.max(
+    options.output || options.apng || options.redGif || options.redApng ? options.fps : 0,
+    options.gif50 || options.redGif50 ? gif50Fps : 0,
+    options.mp4 ? options.videoFps : 0,
+  );
   const frameCount = Math.round(duration * captureFps);
 
   console.log('Measuring the complete rotation...');
   let bounds;
   for (let frame = 0; frame < frameCount; frame += 1) {
-    const time = frame * 1000 / captureFps;
+    const time = animationTime(frame, captureFps, duration, options.direction);
     await setAnimationTime(cdp, time);
     bounds = unionBounds(bounds, await measureBook(cdp));
   }
@@ -119,7 +124,7 @@ try {
   const clip = paddedClip(bounds, options.margin, options.padding, captureHeight);
 
   for (let frame = 0; frame < frameCount; frame += 1) {
-    const time = frame * 1000 / captureFps;
+    const time = animationTime(frame, captureFps, duration, options.direction);
     await setAnimationTime(cdp, time);
 
     const screenshot = await cdp.send('Page.captureScreenshot', {
@@ -138,9 +143,17 @@ try {
   process.stdout.write('\n');
   cdp.close();
 
-  await encodeGif(frameDirectory, options.output, captureFps, options.fps, null, options.height);
-  if (gifsiclePath) await compressGif(options.output, gifsiclePath);
-  console.log(`GIF: ${options.output}`);
+  if (options.output) {
+    await encodeGif(frameDirectory, options.output, captureFps, options.fps, null, options.height);
+    if (gifsiclePath) await compressGif(options.output, gifsiclePath);
+    console.log(`GIF: ${options.output}`);
+  }
+
+  if (options.gif50) {
+    await encodeGif(frameDirectory, options.gif50, captureFps, gif50Fps, null, options.height);
+    if (gifsiclePath) await compressGif(options.gif50, gifsiclePath);
+    console.log(`50 fps GIF: ${options.gif50}`);
+  }
 
   if (options.apng) {
     await encodeApng(frameDirectory, options.apng, captureFps, options.fps, null, options.height);
@@ -154,6 +167,15 @@ try {
     });
     if (gifsiclePath) await compressGif(options.redGif, gifsiclePath);
     console.log(`Red GIF: ${options.redGif}`);
+  }
+
+  if (options.redGif50) {
+    await encodeGif(frameDirectory, options.redGif50, captureFps, gif50Fps, {
+      background: options.background,
+      size: options.squareSize,
+    });
+    if (gifsiclePath) await compressGif(options.redGif50, gifsiclePath);
+    console.log(`50 fps red GIF: ${options.redGif50}`);
   }
 
   if (options.redApng) {
@@ -194,14 +216,17 @@ function parseArguments(args) {
     margin: 0.1,
     padding: 0,
     output: path.resolve('output/book-spinner.gif'),
+    gif50: path.resolve('output/book-spinner-50fps.gif'),
     apng: path.resolve('output/book-spinner.png'),
     redGif: path.resolve('output/book-spinner-red.gif'),
+    redGif50: path.resolve('output/book-spinner-red-50fps.gif'),
     redApng: path.resolve('output/book-spinner-red.png'),
     mp4: path.resolve('output/book-spinner-red.mp4'),
     videoFps: 60,
     videoSize: 2400,
     squareSize: 1200,
     background: null,
+    direction: 'cw',
     source: null,
     keepFrames: null,
     chrome: null,
@@ -215,8 +240,10 @@ function parseArguments(args) {
 
 Options:
   --output <file>       GIF destination (default: output/book-spinner.gif)
+  --gif-50 <file>       50 fps GIF destination (default: output/book-spinner-50fps.gif)
   --apng <file>         Full-alpha APNG (default: output/book-spinner.png)
   --red-gif <file>      Square red GIF (default: output/book-spinner-red.gif)
+  --red-gif-50 <file>   50 fps square red GIF (default: output/book-spinner-red-50fps.gif)
   --red-apng <file>     Square red APNG (default: output/book-spinner-red.png)
   --mp4 <file>          Square red H.264 video (default: output/book-spinner-red.mp4)
   --fps <number>        GIF and APNG frame rate (default: 24)
@@ -227,14 +254,18 @@ Options:
   --height <pixels>     Final animation height (default: 1200)
   --square-size <px>    Red output width and height (default: 1200)
   --background <hex>    Red output background override (default: read from CSS)
+  --direction <cw|ccw>  Spin direction (default: cw)
   --source <file>       HTML source (default: index.html, then text.html)
   --margin <fraction>   Margin per side, relative to book size (default: 0.1)
   --padding <pixels>    Additional pre-scale padding per side (default: 0)
   --keep-frames <dir>   Preserve the transparent PNG frame sequence
   --chrome <path>       Chrome/Chromium executable override
   --compress            Optimize GIF outputs with Gifsicle lossy level 20
+  --only-gif-50         Skip all outputs except the 50 fps GIFs
+  --no-transparent      Skip transparent GIF and APNG outputs
   --no-apng             Skip the transparent APNG
-  --no-red              Skip both square red GIF and APNG
+  --no-red              Skip square red outputs
+  --no-gif-50           Skip both 50 fps GIFs
   --no-mp4              Skip the MP4
 `);
       process.exit(0);
@@ -244,9 +275,29 @@ Options:
       values.apng = null;
       continue;
     }
-    if (argument === '--no-red') {
+    if (argument === '--no-transparent') {
+      values.output = null;
+      values.gif50 = null;
+      values.apng = null;
+      continue;
+    }
+    if (argument === '--only-gif-50') {
+      values.output = null;
+      values.apng = null;
       values.redGif = null;
       values.redApng = null;
+      values.mp4 = null;
+      continue;
+    }
+    if (argument === '--no-red') {
+      values.redGif = null;
+      values.redGif50 = null;
+      values.redApng = null;
+      continue;
+    }
+    if (argument === '--no-gif-50') {
+      values.gif50 = null;
+      values.redGif50 = null;
       continue;
     }
     if (argument === '--no-mp4') {
@@ -263,8 +314,10 @@ Options:
     index += 1;
 
     if (argument === '--output') values.output = path.resolve(value);
+    else if (argument === '--gif-50') values.gif50 = path.resolve(value);
     else if (argument === '--apng') values.apng = path.resolve(value);
     else if (argument === '--red-gif') values.redGif = path.resolve(value);
+    else if (argument === '--red-gif-50') values.redGif50 = path.resolve(value);
     else if (argument === '--red-apng') values.redApng = path.resolve(value);
     else if (argument === '--mp4') values.mp4 = path.resolve(value);
     else if (argument === '--fps') values.fps = positiveNumber(value, argument);
@@ -275,6 +328,7 @@ Options:
     else if (argument === '--height') values.height = positiveNumber(value, argument);
     else if (argument === '--square-size') values.squareSize = positiveNumber(value, argument);
     else if (argument === '--background') values.background = hexColor(value, argument);
+    else if (argument === '--direction') values.direction = direction(value, argument);
     else if (argument === '--source') values.source = path.resolve(value);
     else if (argument === '--margin') values.margin = nonnegativeNumber(value, argument);
     else if (argument === '--padding') values.padding = nonnegativeNumber(value, argument);
@@ -290,6 +344,9 @@ Options:
   if (!Number.isInteger(values.height)) throw new Error('--height must be an integer');
   if (!Number.isInteger(values.squareSize)) throw new Error('--square-size must be an integer');
   if (values.mp4 && values.videoSize % 2 !== 0) throw new Error('--video-size must be even for H.264 output');
+  if (!values.output && !values.gif50 && !values.apng && !values.redGif && !values.redGif50 && !values.redApng && !values.mp4) {
+    throw new Error('No outputs requested.');
+  }
   return values;
 }
 
@@ -308,6 +365,16 @@ function nonnegativeNumber(value, option) {
 function hexColor(value, option) {
   if (!/^#[0-9a-f]{6}$/i.test(value)) throw new Error(`${option} must be a six-digit hex color`);
   return value.toLowerCase();
+}
+
+function direction(value, option) {
+  if (!['cw', 'ccw'].includes(value)) throw new Error(`${option} must be cw or ccw`);
+  return value;
+}
+
+function animationTime(frame, fps, duration, direction) {
+  const time = frame * 1000 / fps;
+  return direction === 'ccw' ? duration * 1000 - time : time;
 }
 
 function cssColorToHex(value, description) {
