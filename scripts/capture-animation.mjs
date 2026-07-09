@@ -24,7 +24,7 @@ try {
   await mkdir(frameDirectory, { recursive: true });
   await mkdir(profileDirectory, { recursive: true });
 
-  const pageUrl = await createCapturePage(root, workDirectory, options.source);
+  const pageUrl = await createCapturePage(root, workDirectory, options.source, options.direction);
 
   console.log('Starting Chrome...');
   chrome = spawn(chromePath, [
@@ -116,7 +116,7 @@ try {
   console.log('Measuring the complete rotation...');
   let bounds;
   for (let frame = 0; frame < frameCount; frame += 1) {
-    const time = animationTime(frame, captureFps, duration, options.direction);
+    const time = frame * 1000 / captureFps;
     await setAnimationTime(cdp, time);
     bounds = unionBounds(bounds, await measureBook(cdp));
   }
@@ -124,7 +124,7 @@ try {
   const clip = paddedClip(bounds, options.margin, options.padding, captureHeight);
 
   for (let frame = 0; frame < frameCount; frame += 1) {
-    const time = animationTime(frame, captureFps, duration, options.direction);
+    const time = frame * 1000 / captureFps;
     await setAnimationTime(cdp, time);
 
     const screenshot = await cdp.send('Page.captureScreenshot', {
@@ -372,11 +372,6 @@ function direction(value, option) {
   return value;
 }
 
-function animationTime(frame, fps, duration, direction) {
-  const time = frame * 1000 / fps;
-  return direction === 'ccw' ? duration * 1000 - time : time;
-}
-
 function cssColorToHex(value, description) {
   const match = value.match(/^rgba?\(\s*([0-9.]+)\s*(?:,|\s)\s*([0-9.]+)\s*(?:,|\s)\s*([0-9.]+)(?:\s*(?:,|\/)\s*([0-9.]+))?\s*\)$/i);
   if (!match) throw new Error(`Could not read ${description} as an RGB color: ${value}`);
@@ -409,14 +404,25 @@ function findChrome() {
   return found;
 }
 
-async function createCapturePage(directory, temporaryDirectory, requestedSource) {
+async function createCapturePage(directory, temporaryDirectory, requestedSource, direction) {
   const sourceFile = requestedSource ?? findCaptureSource(directory);
   const source = await readFile(sourceFile, 'utf8');
   const imageBase = `${pathToFileURL(path.join(directory, 'img')).href}/`;
-  const captureSource = source.replaceAll('url(/img/', `url(${imageBase}`);
+  const captureSource = spinDirectionSource(source, direction)
+    .replaceAll('url(/img/', `url(${imageBase}`);
   const filename = path.join(temporaryDirectory, 'capture.html');
   await writeFile(filename, captureSource);
   return pathToFileURL(filename).href;
+}
+
+function spinDirectionSource(source, direction) {
+  const clockwise = 'animation: revolve-cw 10s linear infinite;';
+  const counterClockwise = 'animation: revolve-cw reverse 10s linear infinite;';
+  const normalized = source.replace(counterClockwise, clockwise);
+  if (!normalized.includes(clockwise)) {
+    throw new Error('Could not find the book spin animation line.');
+  }
+  return normalized.replace(clockwise, direction === 'ccw' ? counterClockwise : clockwise);
 }
 
 function findCaptureSource(directory) {
