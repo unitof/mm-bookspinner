@@ -673,6 +673,8 @@ async function encodeMp4(frames, output, sourceFps, outputFps, square) {
     '-preset', 'slow',
     '-tune', 'animation',
     '-crf', '12',
+    // All-intra avoids a Preview/Quick Look temporal decode glitch seen in
+    // notes/interframe glitch.jpeg. It increases MP4 size substantially.
     '-g', '1',
     '-bf', '0',
     '-color_range', 'tv',
