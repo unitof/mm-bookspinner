@@ -2,9 +2,12 @@
 	"name": "mm-bookspinner",
 	"author": "Jacob Ford <for.j@cobford.com>",
 	"scripts": {
-		"capture": "node scripts/capture-animation.mjs"
+		"build": "exit",
+		"capture": "node scripts/capture-animation.mjs",
+		"dev": "http-server"
 	},
 	"devDependencies": {
-		"gifsicle": "^7.0.1"
+		"gifsicle": "^7.0.1",
+		"http-server": "^14.1.1"
 	}
 }
